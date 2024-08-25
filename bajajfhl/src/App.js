@@ -5,6 +5,7 @@ const App = () => {
   const [jsonInput, setJsonInput] = useState("");
   const [error, setError] = useState("");
   const [result, setResult]  = useState({});
+  const [op, setOp] = useState("");
   const [options, setOptions] = useState([
     "Alphabets",
     "Numbers",
@@ -15,9 +16,6 @@ const App = () => {
     setSelectedOpt(selectedOptions);
   };
   const [selectedOpt, setSelectedOpt] = useState([]);
-  useEffect(()=>{
-    console.log(selectedOpt)
-  },[selectedOpt])
   // Function to validate JSON
   const isValidJson = (input) => {
     try {
@@ -34,22 +32,33 @@ const App = () => {
       setError("Invalid JSON format");
       return;
     }
-
     setError("");
-
     try {
+      console.log("Parsed Input:", JSON.parse(jsonInput));
       const response = await axios.post(
         "https://bajaj-backend-1-8y4m.onrender.com/bfhl",
         JSON.parse(jsonInput)
       );
       const data = response.data;
       setResult(data);
-      console.log(result)
-
+      console.log(result);
+      console.log(selectedOpt);
+      let output = ""
+      if(selectedOpt.includes("Numbers")){
+        output += "Numbers : " + String(result["numbers"])
+      }
+      if(selectedOpt.includes("Highest lowercase alphabet")){
+        output += "Highest Lowercase Aphabet : " + String(result["highest_lowercase_alphabet"])
+      }
+      if(selectedOpt.includes("Alphabets")){
+        output +="\nAlphabets : " +String(result["alphabets"])
+      }
+      setOp(output);
     } catch (err) {
+      console.error("Error details:", err);
       setError("API call failed");
     }
-  };
+  }
 
   return (
     <div style={{ padding: "20px" }}>
@@ -78,7 +87,11 @@ const App = () => {
       </div>
     </div>
     <button onClick={handleSubmit}>Submit</button>
+    <div className="RESULTS">
+      Filtered Response <br />
+      {op}
 
+    </div>
    
     </div>
   );
